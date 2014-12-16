@@ -92,6 +92,21 @@ namespace PokerHands.Test
             winner.Details.Should().Be("FourOfAKind: Twos");
         }
 
+        [Test]
+        public void TestStraight()
+        {
+            const string Black = "2H 3D 4S 5C 6D";
+            const string White = "2D 3H 5S 7C 9H";
+
+            var hands = _builder.Build(Black, White);
+
+            var winner = _pokerHands.CalculateWinner(hands);
+
+            winner.Player.Should().Be(Player.Black);
+            winner.Hand.Should().Be(HandType.Straight);
+            winner.Details.Should().Be("Straight: 2 3 4 5 6");
+        }
+
     }
 
     public class HandBuilder

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
-using PokerHands.Enums;
+﻿using PokerHands.Enums;
 using PokerHands.Model;
 using PokerHands.Parsers;
 

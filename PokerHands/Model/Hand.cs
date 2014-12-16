@@ -37,7 +37,17 @@ namespace PokerHands.Model
 
         private void InterpretHand()
         {
-            if (OfAKind())
+            if (OfAKind(HandType.FourOfAKind))
+            {
+                return;
+            }
+
+            if (Straight())
+            {
+                return;
+            }
+
+            if (OfAKind(HandType.ThreeOfAKind))
             {
                 return;
             }
@@ -50,9 +60,34 @@ namespace PokerHands.Model
             HighCard();
         }
 
+        private bool Straight()
+        {
+            var values = Cards.Select(c => c.Value);
+            var orderedValues = values.OrderBy(c => c).ToList();
+
+            var detailsString = "Straight:";
+
+            for (var i = 0; i < orderedValues.Count - 1; ++i)
+            {
+                var difference = orderedValues[i + 1] - orderedValues[i];
+
+                if (difference != 1)
+                {
+                    return false;
+                }
+
+                detailsString += " " + (int) orderedValues[i];
+            }
+
+            _handType = HandType.Straight;
+            _details = detailsString + " " + (int) orderedValues.Last();
+
+            return true;
+        }
+
         private bool Pairs()
         {
-            var rankedByValue = Cards.OrderBy(c => c.Value).Reverse();
+            var rankedByValue = Cards.OrderByDescending(c => c.Value);
 
             var pairs = new List<Value>(2);
 
@@ -84,9 +119,11 @@ namespace PokerHands.Model
             }
         }
 
-        private bool OfAKind()
+        private bool OfAKind(HandType handType)
         {
-            var rankedByValue = Cards.OrderBy(c => c.Value).Reverse();
+            var count = handType == HandType.ThreeOfAKind ? 3 : 4;
+
+            var rankedByValue = Cards.OrderByDescending(c => c.Value);
 
             foreach (var card in rankedByValue)
             {
@@ -94,14 +131,9 @@ namespace PokerHands.Model
 
                 var matches = Cards.Where(c => c.Value == value);
 
-                switch (matches.Count())
+                if (matches.Count() == count)
                 {
-                    case 4:
-                        SetProperties(HandType.FourOfAKind, value);
-                        return true;
-                    case 3:
-                        SetProperties(HandType.ThreeOfAKind, value);
-                        return true;
+                    SetProperties(handType, value);
                 }
             }
 
