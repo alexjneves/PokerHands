@@ -32,6 +32,66 @@ namespace PokerHands.Test
             winner.Details.Should().Be("Ace of Diamonds");
         }
 
+        [Test]
+        public void TestPair()
+        {
+            const string Black = "2H 2D 5S 9C AD";
+            const string White = "2D 3H 5S 7C 9H";
+
+            var hands = _builder.Build(Black, White);
+
+            var winner = _pokerHands.CalculateWinner(hands);
+
+            winner.Player.Should().Be(Player.Black);
+            winner.Hand.Should().Be(HandType.Pair);
+            winner.Details.Should().Be("Pair: Twos");
+        }
+
+        [Test]
+        public void TestTwoPair()
+        {
+            const string Black = "2H 2D 5S 5C AD";
+            const string White = "2D 3H 5S 7C 9H";
+
+            var hands = _builder.Build(Black, White);
+
+            var winner = _pokerHands.CalculateWinner(hands);
+
+            winner.Player.Should().Be(Player.Black);
+            winner.Hand.Should().Be(HandType.TwoPair);
+            winner.Details.Should().Be("TwoPair: Fives and Twos");
+        }
+
+        [Test]
+        public void TestThreeOfAKind()
+        {
+            const string Black = "2H 2D 2S 9C AD";
+            const string White = "2D 3H 5S 7C 9H";
+
+            var hands = _builder.Build(Black, White);
+
+            var winner = _pokerHands.CalculateWinner(hands);
+
+            winner.Player.Should().Be(Player.Black);
+            winner.Hand.Should().Be(HandType.ThreeOfAKind);
+            winner.Details.Should().Be("ThreeOfAKind: Twos");
+        }
+
+        [Test]
+        public void TestFourOfAKind()
+        {
+            const string Black = "2H 2D 2S 2C AD";
+            const string White = "2D 3H 5S 7C 9H";
+
+            var hands = _builder.Build(Black, White);
+
+            var winner = _pokerHands.CalculateWinner(hands);
+
+            winner.Player.Should().Be(Player.Black);
+            winner.Hand.Should().Be(HandType.FourOfAKind);
+            winner.Details.Should().Be("FourOfAKind: Twos");
+        }
+
     }
 
     public class HandBuilder

@@ -10,7 +10,7 @@ namespace PokerHands.Model
 
         public override string ToString()
         {
-            return string.Format("{0} of {1}", Value.ToString(), Suit.ToString());
+            return string.Format("{0} of {1}", Value, Suit);
         }
     }
 }
