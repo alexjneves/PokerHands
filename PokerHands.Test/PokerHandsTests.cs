@@ -7,6 +7,7 @@ namespace PokerHands.Test
     [TestFixture]
     public class PokerHandsTests
     {
+        private const string White = "2D 3H 5S 7C 9H";
         private PokerHands _pokerHands;
         private HandBuilder _builder;
 
@@ -21,7 +22,6 @@ namespace PokerHands.Test
         public void TestHighCard()
         {
             const string Black = "2H 3D 5S 9C AD";
-            const string White = "2D 3H 5S 7C 9H";
 
             var hands = _builder.Build(Black, White);
 
@@ -36,7 +36,6 @@ namespace PokerHands.Test
         public void TestPair()
         {
             const string Black = "2H 2D 5S 9C AD";
-            const string White = "2D 3H 5S 7C 9H";
 
             var hands = _builder.Build(Black, White);
 
@@ -51,7 +50,6 @@ namespace PokerHands.Test
         public void TestTwoPair()
         {
             const string Black = "2H 2D 5S 5C AD";
-            const string White = "2D 3H 5S 7C 9H";
 
             var hands = _builder.Build(Black, White);
 
@@ -59,14 +57,13 @@ namespace PokerHands.Test
 
             winner.Player.Should().Be(Player.Black);
             winner.Hand.Should().Be(HandType.TwoPair);
-            winner.Details.Should().Be("TwoPair: Fives and Twos");
+            winner.Details.Should().Be("TwoPair: Twos and Fives");
         }
 
         [Test]
         public void TestThreeOfAKind()
         {
             const string Black = "2H 2D 2S 9C AD";
-            const string White = "2D 3H 5S 7C 9H";
 
             var hands = _builder.Build(Black, White);
 
@@ -81,7 +78,6 @@ namespace PokerHands.Test
         public void TestFourOfAKind()
         {
             const string Black = "2H 2D 2S 2C AD";
-            const string White = "2D 3H 5S 7C 9H";
 
             var hands = _builder.Build(Black, White);
 
@@ -96,7 +92,6 @@ namespace PokerHands.Test
         public void TestStraight()
         {
             const string Black = "2H 3D 4S 5C 6D";
-            const string White = "2D 3H 5S 7C 9H";
 
             var hands = _builder.Build(Black, White);
 
@@ -107,6 +102,47 @@ namespace PokerHands.Test
             winner.Details.Should().Be("Straight: 2 3 4 5 6");
         }
 
+        [Test]
+        public void TestFlush()
+        {
+            const string Black = "2H 3H 5H 6H 9H";
+
+            var hands = _builder.Build(Black, White);
+
+            var winner = _pokerHands.CalculateWinner(hands);
+
+            winner.Player.Should().Be(Player.Black);
+            winner.Hand.Should().Be(HandType.Flush);
+            winner.Details.Should().Be("Flush: Hearts");
+        }
+
+        [Test]
+        public void TestStraightFlush()
+        {
+            const string Black = "2H 3H 4H 5H 6H";
+
+            var hands = _builder.Build(Black, White);
+
+            var winner = _pokerHands.CalculateWinner(hands);
+
+            winner.Player.Should().Be(Player.Black);
+            winner.Hand.Should().Be(HandType.StraightFlush);
+            winner.Details.Should().Be("StraightFlush");
+        }
+
+        [Test]
+        public void TestFullHouse()
+        {
+            const string Black = "2H 2D 5S 5C 5H";
+
+            var hands = _builder.Build(Black, White);
+
+            var winner = _pokerHands.CalculateWinner(hands);
+
+            winner.Player.Should().Be(Player.Black);
+            winner.Hand.Should().Be(HandType.FullHouse);
+            winner.Details.Should().Be("FullHouse");
+        }
     }
 
     public class HandBuilder

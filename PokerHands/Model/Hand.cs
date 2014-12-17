@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using PokerHands.Enums;
+using PokerHands.Exceptions;
 
 namespace PokerHands.Model
 {
@@ -37,27 +38,63 @@ namespace PokerHands.Model
 
         private void InterpretHand()
         {
+            var flush = Flush();
+            var straight = Straight();
+
+            if (flush && straight)
+            {
+                _handType = HandType.StraightFlush;
+                _details = "StraightFlush";
+                return;
+            }
+
             if (OfAKind(HandType.FourOfAKind))
             {
                 return;
             }
 
-            if (Straight())
+            var threeOfAKind = OfAKind(HandType.ThreeOfAKind);
+            var pair = Pairs();
+
+            if (threeOfAKind && pair)
+            {
+                _handType = HandType.FullHouse;
+                _details = "FullHouse";
+                return;
+            }
+
+            if (flush || straight)
             {
                 return;
             }
 
-            if (OfAKind(HandType.ThreeOfAKind))
+            if (threeOfAKind)
             {
                 return;
             }
 
-            if (Pairs())
+            if (pair)
             {
                 return;
             }
 
             HighCard();
+        }
+
+        private bool Flush()
+        {
+            var suit = Cards.First().Suit;
+
+            var matches = Cards.Where(c => c.Suit == suit);
+
+            if (matches.Count() == 5)
+            {
+                _handType = HandType.Flush;
+                _details = string.Format("Flush: {0}", suit);
+                return true;
+            }
+
+            return false;
         }
 
         private bool Straight()
@@ -87,11 +124,9 @@ namespace PokerHands.Model
 
         private bool Pairs()
         {
-            var rankedByValue = Cards.OrderByDescending(c => c.Value);
-
             var pairs = new List<Value>(2);
 
-            foreach (var card in rankedByValue)
+            foreach (var card in Cards)
             {
                 var value = card.Value;
 
@@ -123,9 +158,7 @@ namespace PokerHands.Model
         {
             var count = handType == HandType.ThreeOfAKind ? 3 : 4;
 
-            var rankedByValue = Cards.OrderByDescending(c => c.Value);
-
-            foreach (var card in rankedByValue)
+            foreach (var card in Cards)
             {
                 var value = card.Value;
 
@@ -134,6 +167,7 @@ namespace PokerHands.Model
                 if (matches.Count() == count)
                 {
                     SetProperties(handType, value);
+                    return true;
                 }
             }
 
