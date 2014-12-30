@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using PokerHands.Enums;
-using PokerHands.Exceptions;
 
 namespace PokerHands.Model
 {
@@ -43,8 +42,7 @@ namespace PokerHands.Model
 
             if (flush && straight)
             {
-                _handType = HandType.StraightFlush;
-                _details = "StraightFlush";
+                SetProperties(HandType.StraightFlush, "StraightFlush");
                 return;
             }
 
@@ -58,8 +56,7 @@ namespace PokerHands.Model
 
             if (threeOfAKind && pair)
             {
-                _handType = HandType.FullHouse;
-                _details = "FullHouse";
+                SetProperties(HandType.FullHouse, "FullHouse");
                 return;
             }
 
@@ -89,8 +86,8 @@ namespace PokerHands.Model
 
             if (matches.Count() == 5)
             {
-                _handType = HandType.Flush;
-                _details = string.Format("Flush: {0}", suit);
+                var details = string.Format("Flush: {0}", suit);
+                SetProperties(HandType.Flush, details);
                 return true;
             }
 
@@ -116,8 +113,9 @@ namespace PokerHands.Model
                 detailsString += " " + (int) orderedValues[i];
             }
 
-            _handType = HandType.Straight;
-            _details = detailsString + " " + (int) orderedValues.Last();
+            var details = detailsString + " " + (int) orderedValues.Last();
+
+            SetProperties(HandType.Straight, details);
 
             return true;
         }
@@ -146,8 +144,8 @@ namespace PokerHands.Model
                     SetProperties(HandType.Pair, pairs[0]);
                     return true;
                 case 2:
-                    _handType = HandType.TwoPair;
-                    _details = string.Format("{0}: {1}s and {2}s", _handType, pairs[0], pairs[1]);
+                    var details = string.Format("{0}: {1}s and {2}s", _handType, pairs[0], pairs[1]);
+                    SetProperties(HandType.TwoPair, details);
                     return true;
                 default:
                     return false;
@@ -188,14 +186,19 @@ namespace PokerHands.Model
                 }
             }
 
-            _handType = HandType.HighCard;
-            _details = highestCard.ToString();
+            SetProperties(HandType.HighCard, highestCard.ToString());
         }
 
         private void SetProperties(HandType handType, Value value)
         {
+            var details = string.Format("{0}: {1}s", handType, value);
+            SetProperties(handType, details);
+        }
+
+        private void SetProperties(HandType handType, string details)
+        {
             _handType = handType;
-            _details = string.Format("{0}: {1}s", handType, value);
+            _details = details;
         }
     }
 }
